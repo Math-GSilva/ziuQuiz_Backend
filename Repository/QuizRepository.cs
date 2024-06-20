@@ -1,31 +1,32 @@
 ﻿using Domain.Entity;
 using Domain.Repository;
 using Infra;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Repository
 {
     public class QuizRepository : BaseRepository<Quiz, int>, IQuizRepository
     {
-        public QuizRepository() { }
-
-        public QuizRepository(UsuarioDbContext db)
-            : base(db)
+        public QuizRepository(QuizDbContext db) : base(db)
         {
         }
 
-        public void DeleteQuiz(int quizId) => base.Delete(quizId);
+        public Task DeleteQuizAsync(int quizId) => Delete(quizId);
 
-        public Task<List<Quiz>> GetAllQuiz() => base.GetAll();
+        public Task<List<Quiz>> GetAllQuizAsync() => GetAll(new List<string> { "Questions" });
 
-        public Task<Quiz?> GetFavorites(string user)
+        public Task<Quiz?> GetFavoritesAsync(string user)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Quiz?> GetQuiz(int quizID) => base.Get(quizID);
+        public Task<Quiz?> GetQuizAsync(int quizID) => Get(quizID, new List<string> { "Questions" });
 
-        public Quiz Save(Quiz quiz) => base.Add(quiz);
+        public Task<Quiz> SaveAsync(Quiz quiz) => Add(quiz);
 
-        public void UpdateQuiz(Quiz quiz) => base.Update(quiz);
+        public Task UpdateQuizAsync(Quiz quiz) => Update(quiz);
     }
 }

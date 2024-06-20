@@ -10,8 +10,9 @@ namespace Domain.Repository
     public interface IUsuarioRepository
     {
         public Task<Usuario?> GetUsuario(string user);
-        public Usuario Save(Usuario usuario);
+        public Task<Usuario> SaveAsync(Usuario usuario);
         public Task<List<Usuario>> GetAllUsuarios();
-        public void UpdateUsuario(Usuario usuario);
+        public Task UpdateUsuarioAsync(Usuario usuario);
+
     }
 }

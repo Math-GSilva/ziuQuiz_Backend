@@ -9,7 +9,7 @@ namespace Domain.Service
 {
     public interface IUsuarioService
     {
-        public Usuario SaveUsuario(Usuario usuario);
+        public Task<Usuario> SaveUsuarioAsync(Usuario usuario);
         public Task<bool> Login(LoginRequestCommand login);
     }
 }

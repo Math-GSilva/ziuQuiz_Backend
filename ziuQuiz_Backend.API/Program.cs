@@ -39,6 +39,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<UsuarioDbContext>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddDbContext<QuizDbContext>();
+builder.Services.AddScoped<IQuizService, QuizService>();
+builder.Services.AddScoped<IQuizRepository, QuizRepository>();
 
 var app = builder.Build();
 

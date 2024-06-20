@@ -1,27 +1,40 @@
 ﻿using Domain.Entity;
 using Domain.Repository;
 using Infra;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Repository
 {
     public class UsuarioRepository : BaseRepository<Usuario, int>, IUsuarioRepository
     {
-        public UsuarioRepository() { }
-
         public UsuarioRepository(UsuarioDbContext db)
             : base(db)
         {
         }
+
         public async Task<Usuario?> GetUsuario(string user)
         {
-            var results = await base.GetAll();
-            return results.Find(usuario => usuario.Email.Equals(user, StringComparison.Ordinal));
+            var results = await GetAll();
+            return results.FirstOrDefault(usuario => usuario.Email.Equals(user, StringComparison.OrdinalIgnoreCase));
         }
 
-        public Usuario Save(Usuario usuario) => Add(usuario);
+        public async Task<Usuario> SaveAsync(Usuario usuario)
+        {
+            return await Add(usuario);
+        }
 
-        public Task<List<Usuario>> GetAllUsuarios() => base.GetAll();
+        public async Task<List<Usuario>> GetAllUsuarios()
+        {
+            return await GetAll();
+        }
 
-        public void UpdateUsuario(Usuario usuario) => base.Update(usuario);
+        public async Task UpdateUsuarioAsync(Usuario usuario)
+        {
+            await Update(usuario);
+        }
     }
 }

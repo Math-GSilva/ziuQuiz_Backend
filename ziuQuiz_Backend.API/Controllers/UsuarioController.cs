@@ -15,7 +15,7 @@ namespace ziuQuiz_Backend.API.Controllers
         [HttpPost]
         public IActionResult Add([FromBody] Usuario usuario)
         {
-            return Ok(usuarioService.SaveUsuario(usuario));
+            return Ok(usuarioService.SaveUsuarioAsync(usuario));
         }
 
         [HttpPost]
@@ -25,7 +25,8 @@ namespace ziuQuiz_Backend.API.Controllers
             bool valid = await usuarioService.Login(login);
             if (valid)
             {
-                return Ok(GenerateJwtToken(login.Email));
+                var token = GenerateJwtToken(login.Email);
+                return Ok(new { token });
             }
 
             return Unauthorized();

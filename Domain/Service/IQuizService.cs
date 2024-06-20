@@ -9,11 +9,11 @@ namespace Domain.Service
 {
     public interface IQuizService
     {
-        public Task<List<Quiz>> GetQuizList();
-        public List<Quiz> GetFavorites(string user);
-        public Task<Quiz> GetQuiz(int id);
-        public Quiz SaveQuiz(Quiz quiz);
-        public void DeleteQuiz(int id);
-        public void UpdateQuiz(Quiz quiz);
+        public Task<List<Quiz>> GetQuizListAsync();
+        public Task<List<Quiz>> GetFavoritesAsync(string user);
+        public Task<Quiz> GetQuizAsync(int id);
+        public Task<Quiz> SaveQuizAsync(Quiz quiz);
+        public Task DeleteQuizAsync(int id);
+        public Task UpdateQuizAsync(Quiz quiz);
     }
 }

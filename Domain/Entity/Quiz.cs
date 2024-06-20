@@ -4,11 +4,8 @@ using Domain.Repository;
 
 namespace Domain.Entity
 {
-    [Table("Quiz")]
     public class Quiz : IEntity<int>
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string Nome { get; set; }
         public string Imagem { get; set; }
@@ -16,8 +13,8 @@ namespace Domain.Entity
         public int TimesPlayed{ get; set; }
         public int RankedPlayers{ get; set; }
         public int Favourites{ get; set; }
+        public int CategoryId { get; set; }
         public Category Category { get; set; }
-        public List<string> Tags{ get; set; }
-        public List<Question> Questions { get; set; }
+        public ICollection<Question> Questions { get; set; }
     }
 }

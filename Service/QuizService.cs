@@ -3,32 +3,61 @@ using Domain.Repository;
 using Domain.Service;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Service
 {
     public class QuizService : IQuizService
     {
-        IQuizRepository quizRepository;
+        private readonly IQuizRepository _quizRepository;
+
         public QuizService(IQuizRepository quizRepository)
         {
-            this.quizRepository = quizRepository;
+            _quizRepository = quizRepository ?? throw new ArgumentNullException(nameof(quizRepository));
         }
 
-        public void DeleteQuiz(int id) => quizRepository.DeleteQuiz(id);
-
-        public List<Quiz> GetFavorites(string user)
+        public async Task DeleteQuizAsync(int id)
         {
-            throw new NotImplementedException();
+            if (id <= 0)
+                throw new ArgumentException("Invalid quiz ID", nameof(id));
+
+            await _quizRepository.DeleteQuizAsync(id);
         }
 
-        public Task<Quiz> GetQuiz(int id) => quizRepository.GetQuiz(id);
+        public async Task<List<Quiz>> GetFavoritesAsync(string user)
+        {
+            if (string.IsNullOrWhiteSpace(user))
+                throw new ArgumentException("User cannot be null or empty", nameof(user));
 
-        public Task<List<Quiz>> GetQuizList() => quizRepository.GetAllQuiz();
-        public Quiz SaveQuiz(Quiz quiz) => quizRepository.Save(quiz);
+            // Aqui você pode implementar a lógica para obter os quizzes favoritos do usuário.
+            // Vou lançar uma exceção genérica por enquanto.
+            throw new NotImplementedException("This method is not yet implemented.");
+        }
 
-        public void UpdateQuiz(Quiz quiz) => quizRepository.UpdateQuiz(quiz);
+        public async Task<Quiz> GetQuizAsync(int id)
+        {
+            if (id <= 0)
+                throw new ArgumentException("Invalid quiz ID", nameof(id));
+
+            return await _quizRepository.GetQuizAsync(id);
+        }
+
+        public async Task<List<Quiz>> GetQuizListAsync() => await _quizRepository.GetAllQuizAsync();
+
+        public async Task<Quiz> SaveQuizAsync(Quiz quiz)
+        {
+            if (quiz == null)
+                throw new ArgumentNullException(nameof(quiz));
+
+            return await _quizRepository.SaveAsync(quiz);
+        }
+
+        public async Task UpdateQuizAsync(Quiz quiz)
+        {
+            if (quiz == null)
+                throw new ArgumentNullException(nameof(quiz));
+
+            await _quizRepository.UpdateQuizAsync(quiz);
+        }
     }
 }

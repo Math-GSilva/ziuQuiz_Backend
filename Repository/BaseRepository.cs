@@ -1,76 +1,105 @@
 ﻿using Domain.Repository;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Repository
 {
     public abstract class BaseRepository<TEntity, TKey> : IBaseRepository<TEntity, TKey>
         where TEntity : class, IEntity<TKey>, new()
     {
-        protected DbContext _db;
-
-        protected BaseRepository() { }
+        protected readonly DbContext _db;
 
         protected BaseRepository(DbContext db)
         {
-            _db = db;
+            _db = db ?? throw new ArgumentNullException(nameof(db));
         }
 
-        public virtual Task<List<TEntity>> GetAll()
+        public virtual async Task<List<TEntity>> GetAll()
         {
-            return _db.Set<TEntity>().ToListAsync();
+            return await _db.Set<TEntity>().ToListAsync();
         }
 
-        public Task<List<TEntity>> GetAll(string include)
+        public async Task<List<TEntity>> GetAll(string include)
         {
-            return _db.Set<TEntity>().Include(include).ToListAsync();
+            return await _db.Set<TEntity>().Include(include).ToListAsync();
         }
 
-        public Task<List<TEntity>> GetAll(IEnumerable<string> includes)
-        {
-            var query = _db.Set<TEntity>().AsQueryable();
-            query = includes.Aggregate(query, (current, include) => current.Include(include));
-            return query.ToListAsync();
-        }
-
-        public virtual Task<TEntity> Get(TKey id)
-        {
-            return _db.Set<TEntity>().SingleOrDefaultAsync(c => c.Id.Equals(id));
-        }
-
-        public Task<TEntity> Get(TKey id, string include)
-        {
-            return _db.Set<TEntity>().Include(include).SingleOrDefaultAsync(c => c.Id.Equals(id));
-        }
-
-        public Task<TEntity> Get(TKey id, IEnumerable<string> includes)
+        public async Task<List<TEntity>> GetAll(IEnumerable<string> includes)
         {
             var query = _db.Set<TEntity>().AsQueryable();
             query = includes.Aggregate(query, (current, include) => current.Include(include));
-            return query.SingleOrDefaultAsync(c => c.Id.Equals(id));
+            return await query.ToListAsync();
         }
 
-        public virtual TEntity Add(TEntity entity)
+        public virtual async Task<TEntity?> Get(TKey id)
+        {
+            return await _db.Set<TEntity>().SingleOrDefaultAsync(c => c.Id.Equals(id));
+        }
+
+        public async Task<TEntity?> Get(TKey id, string include)
+        {
+            return await _db.Set<TEntity>().Include(include).SingleOrDefaultAsync(c => c.Id.Equals(id));
+        }
+
+        public async Task<TEntity?> Get(TKey id, IEnumerable<string> includes)
+        {
+            var query = _db.Set<TEntity>().AsQueryable();
+            query = includes.Aggregate(query, (current, include) => current.Include(include));
+            return await query.SingleOrDefaultAsync(c => c.Id.Equals(id));
+        }
+
+        public virtual async Task<TEntity> Add(TEntity entity)
+        {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
+            try
+            {
+                await _db.Set<TEntity>().AddAsync(entity);
+                await _db.SaveChangesAsync();
+                return entity;
+            }
+            catch (Exception ex)
+            {
+                // Log exception (ex) here if needed
+                throw new Exception("Error adding entity", ex);
+            }
+        }
+
+        public async Task AddRange(IEnumerable<TEntity> entities)
+        {
+            if (entities == null)
+                throw new ArgumentNullException(nameof(entities));
+
+            try
+            {
+                await _db.Set<TEntity>().AddRangeAsync(entities);
+                await _db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                // Log exception (ex) here if needed
+                throw new Exception("Error adding entities", ex);
+            }
+        }
+
+        public virtual async Task Delete(TKey id)
         {
             try
             {
-                _db.Set<TEntity>().Add(entity);
-                _db.SaveChanges();
-                return entity;
+                var entity = new TEntity { Id = id };
+                _db.Set<TEntity>().Attach(entity);
+                _db.Set<TEntity>().Remove(entity);
+                await _db.SaveChangesAsync();
             }
-            catch (Exception ex) { }
-            return entity;
-        }
-
-        public void AddRange(IEnumerable<TEntity> entities)
-        {
-            _db.Set<TEntity>().AddRange(entities);
-        }
-
-        public virtual void Delete(TKey id)
-        {
-            var entity = new TEntity { Id = id };
-            _db.Set<TEntity>().Attach(entity);
-            _db.Set<TEntity>().Remove(entity);
+            catch (Exception ex)
+            {
+                // Log exception (ex) here if needed
+                throw new Exception("Error deleting entity", ex);
+            }
         }
 
         public virtual async Task<bool> SaveChangesAsync()
@@ -78,10 +107,22 @@ namespace Repository
             return (await _db.SaveChangesAsync()) > 0;
         }
 
-        public virtual void Update(TEntity entity)
+        public virtual async Task Update(TEntity entity)
         {
-            _db.Set<TEntity>().Attach(entity);
-            _db.Entry(entity).State = EntityState.Modified;
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
+            try
+            {
+                _db.Set<TEntity>().Attach(entity);
+                _db.Entry(entity).State = EntityState.Modified;
+                await _db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                // Log exception (ex) here if needed
+                throw new Exception("Error updating entity", ex);
+            }
         }
     }
 }

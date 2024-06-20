@@ -35,10 +35,10 @@ namespace Service
             return false;
         }
 
-        public Usuario SaveUsuario(Usuario usuario)
+        public async Task<Usuario> SaveUsuarioAsync(Usuario usuario)
         {
             usuario.Password = BCrypt.Net.BCrypt.HashPassword(usuario.Password);
-            return this.usuarioRepository.Save(usuario);
+            return await usuarioRepository.SaveAsync(usuario);
         }
     }
 }

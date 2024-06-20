@@ -1,17 +1,24 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-using Domain.Repository;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entity
 {
-    [Table("Questao")]
-    public class Question : IEntity<int>
+    public class Question
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public string Description { get; set; }
-        public string Answer { get; set; }
-        public int QuizId { get; set; }
+
+        public int IdQuiz { get; set; }
+
+        [Required]
+        public string Resposta { get; set; }
+
+        [Required]
+        public string Alternativa1 { get; set; }
+
+        [Required]
+        public string Alternativa2 { get; set; }
+
+        [Required]
+        public string Alternativa3 { get; set; }
     }
 }
